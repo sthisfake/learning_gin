@@ -8,6 +8,8 @@ func main() {
 
 	// sth.static
 
+	//sdsgss
+
 	//sth.staticFs
 
 	//sth.staticFile
