@@ -133,21 +133,26 @@ func Login(c *gin.Context){
 
 	// send the jwt back
 
+	// as a cookie :
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie("authorization" , tokenString , 3600 * 24 * 30 , "" , "" , false , true)
+
 	// as a response :
 
 	c.JSON(http.StatusOK , gin.H{
 		"token" : tokenString,
 	})
 
-	// as a cookie :
-	// c.SetSameSite(http.SameSiteLaxMode)
-	// c.SetCookie("authorization" , tokenString , 3600 * 24 * 30 , "" , "" , false , true)
+
 
 	
 }
 
 func Validate(c *gin.Context){
+
+	user , _ := c.Get("user")
+
 	c.JSON(http.StatusOK , gin.H{
-		"massage" : "im logged in",
+		"massage" : user,
 	})
 }
