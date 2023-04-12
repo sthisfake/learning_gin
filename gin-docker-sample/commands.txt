@@ -1,0 +1,5 @@
+https://hackmd.io/@_Cl3aSMeQf2V5wwqxEyfwg/SkR0yzU5s
+
+just the run is different 
+
+docker run -d -p 8080:8080 myapp
