@@ -164,3 +164,91 @@ func Login(c *gin.Context){
 	c.JSON(http.StatusOK ,  response )
 
 }
+
+func Follow(c *gin.Context){
+
+
+	// getting the body of request from fronend
+
+	var body struct{
+		UserEmail string
+		FollowedUserName string
+	}
+
+	if c.Bind(&body) != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to read body ",
+		})
+		return
+	}
+
+	// first querry to find the first user
+	var user models.User 
+	database.StartDb()
+
+	result , err := database.GetUserFromEmail(body.UserEmail)
+
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error" : "invalid email",
+		})
+
+		return
+    }
+
+
+	for result.Next(){
+		if err := result.Scan(&user.ID , &user.Email , &user.Password ); err != nil {
+            panic(err)
+        }
+	}
+
+	if err := result.Err(); err != nil {
+        panic(err)
+    }
+
+	// second querry to find the person should be followd 
+	// by finding it from username
+
+
+	result , err = database.GetUserFromUserName(body.FollowedUserName)
+
+	var secondUser models.User 
+
+	
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error" : "invalid username",
+		})
+
+		return
+    }
+
+
+	for result.Next(){
+		if err := result.Scan(&secondUser.ID); err != nil {
+            panic(err)
+        }
+	}
+
+	if err := result.Err(); err != nil {
+        panic(err)
+    }
+
+	// querry to insert the people involve in follow 
+
+	err = database.InserFollow(user.ID , secondUser.ID)
+
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "failed to create follow entity ",
+		})
+
+		return
+    }
+
+	database.CloseDb()
+
+}

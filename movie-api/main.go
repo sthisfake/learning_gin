@@ -20,6 +20,7 @@ func main() {
 	//endpoints
 	server.POST("/signup" , controllers.SignUp)
 	server.POST("/login" , controllers.Login)
+	server.POST("/follow" , controllers.Follow )
 
 
 	//run the server
