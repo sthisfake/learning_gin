@@ -1,10 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"movies/controllers"
 	"movies/initial"
-	"os"
 
 	"github.com/gin-gonic/gin"
 )
@@ -12,10 +10,7 @@ import (
 func init(){
 	// load .env
 	initial.LoadEnv()
-	if os.Getenv("GETMOVIES") == "true" {
-		fmt.Println("here")
-		os.Setenv("GETMOVIES" , "false")
-	}
+	
 }
 
 func main() {

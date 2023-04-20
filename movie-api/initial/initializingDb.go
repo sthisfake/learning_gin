@@ -1,8 +1,12 @@
 package initial
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
+	"movies/database"
+	"movies/models"
 	"net/http"
 )
 
@@ -26,14 +30,36 @@ func FillingTheMovieTable() {
 		}
 
 
-		// save response as JSON file
-		filename := fmt.Sprintf("movie_%d.json", i)
-		err = ioutil.WriteFile(filename, body, 0644)
+		var movie models.Movie
+		err = json.Unmarshal(body, &movie)
 		if err != nil {
-			fmt.Printf("Error saving response for ID %d: %s\n", i, err.Error())
-			continue
+			log.Fatal(err)
 		}
 
-		fmt.Printf("Data saved for ID %d\n", i)
+		database.StartDb()
+
+		newMovie := models.Movie{
+			Title: movie.Title,
+			Poster: movie.Poster ,
+			Year: movie.Year,
+			Runtime: movie.Runtime,
+			Plot: movie.Plot,
+			Country: movie.Country,
+			IMDBID: movie.IMDBID,
+			Genres: movie.Genres,
+		}
+
+		err = 
+
+
+		// save response as JSON file
+		// filename := fmt.Sprintf("movie_%d.json", i)
+		// err = ioutil.WriteFile(filename, body, 0644)
+		// if err != nil {
+		// 	fmt.Printf("Error saving response for ID %d: %s\n", i, err.Error())
+		// 	continue
+		// }
+
+		// fmt.Printf("Data saved for ID %d\n", i)
 	}
 }
