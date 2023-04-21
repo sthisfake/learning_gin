@@ -12,8 +12,10 @@ import (
 
 func FillingTheMovieTable() {
 	baseURL := "https://moviesapi.ir/api/v1/movies/"
+
+	database.StartDb()
 	
-	for i := 1; i <= 250; i++ {
+	for i := 206; i <= 250; i++ {
 
 		url := fmt.Sprintf("%s%d", baseURL, i)
 		resp, err := http.Get(url)
@@ -36,7 +38,7 @@ func FillingTheMovieTable() {
 			log.Fatal(err)
 		}
 
-		database.StartDb()
+		
 
 		newMovie := models.Movie{
 			Title: movie.Title,
@@ -49,17 +51,19 @@ func FillingTheMovieTable() {
 			Genres: movie.Genres,
 		}
 
-		err = 
+		err = database.InitialInsert(newMovie)
+
+		if err != nil {
+			fmt.Printf("Error fetching data for ID %d: %s\n", i, err.Error())
+			continue
+		}
 
 
-		// save response as JSON file
-		// filename := fmt.Sprintf("movie_%d.json", i)
-		// err = ioutil.WriteFile(filename, body, 0644)
-		// if err != nil {
-		// 	fmt.Printf("Error saving response for ID %d: %s\n", i, err.Error())
-		// 	continue
-		// }
+		fmt.Printf("movie id %d done \n" , i)
 
-		// fmt.Printf("Data saved for ID %d\n", i)
+
+		
 	}
+
+	database.CloseDb()
 }

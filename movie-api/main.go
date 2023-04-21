@@ -10,7 +10,6 @@ import (
 func init(){
 	// load .env
 	initial.LoadEnv()
-	
 }
 
 func main() {
