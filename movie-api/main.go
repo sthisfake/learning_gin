@@ -10,6 +10,7 @@ import (
 func init(){
 	// load .env
 	initial.LoadEnv()
+	initial.FillingTheMovieTable()
 }
 
 func main() {

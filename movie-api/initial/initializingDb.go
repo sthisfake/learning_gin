@@ -15,7 +15,9 @@ func FillingTheMovieTable() {
 
 	database.StartDb()
 	
-	for i := 206; i <= 250; i++ {
+	for i := 1; i <= 250; i++ {
+
+		// getting the movies
 
 		url := fmt.Sprintf("%s%d", baseURL, i)
 		resp, err := http.Get(url)
@@ -31,14 +33,13 @@ func FillingTheMovieTable() {
 			continue
 		}
 
+		// map it to the struct
 
 		var movie models.Movie
 		err = json.Unmarshal(body, &movie)
 		if err != nil {
 			log.Fatal(err)
 		}
-
-		
 
 		newMovie := models.Movie{
 			Title: movie.Title,
@@ -51,18 +52,11 @@ func FillingTheMovieTable() {
 			Genres: movie.Genres,
 		}
 
-		err = database.InitialInsert(newMovie)
+		// insert into movie table
 
-		if err != nil {
-			fmt.Printf("Error fetching data for ID %d: %s\n", i, err.Error())
-			continue
-		}
-
-
-		fmt.Printf("movie id %d done \n" , i)
-
-
+		database.InitialMovieInsert(newMovie , movie)
 		
+		fmt.Printf("movie id %d done \n" , i)		
 	}
 
 	database.CloseDb()
