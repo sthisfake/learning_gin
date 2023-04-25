@@ -4,21 +4,69 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"movies/database"
 	"movies/models"
 	"net/http"
+	"os"
 )
 
 func FillingTheMovieTable() {
-	baseURL := "https://moviesapi.ir/api/v1/movies/"
 
 	database.StartDb()
+
+	for i := 151; i <= 250; i++ {
+
+		// all movies in movies.json file into a slice of array
+
+		jsonData, err := ioutil.ReadFile("movies.json")
+		if err != nil {
+			fmt.Println("Error reading movies data from file:", err)
+			os.Exit(1)
+		}
 	
+		// decode JSON data into slice of Movie structs
+		movies := []models.Movie{}
+		err = json.Unmarshal(jsonData, &movies)
+		if err != nil {
+			fmt.Println("Error decoding movies data from JSON:", err)
+			os.Exit(1)
+		}
+
+		newMovie := models.Movie{
+			Title: trimQuotes(movies[i].Title),
+			Poster: trimQuotes(movies[i].Poster) ,
+			Year: trimQuotes(movies[i].Year),
+			Runtime: trimQuotes(movies[i].Runtime),
+			Plot: trimQuotes(movies[i].Plot),
+			Country: trimQuotes(movies[i].Country),
+			IMDBID: trimQuotes(movies[i].IMDBID),
+			Genres: movies[i].Genres,
+		}
+
+		// insert into movie table
+
+		err = database.InitialMovieInsert(newMovie , movies[i])
+
+		if(err != nil){
+			fmt.Printf("movie id %d  NOT done \n" , i)
+			fmt.Println("*******************************")
+			fmt.Println(err)
+			fmt.Println("*******************************")
+		} else{
+			fmt.Printf("movie id %d done \n" , i)
+		}
+
+	}
+
+	database.CloseDb()
+}
+
+
+func GettingMoviesFromApi() {
+	baseURL := "https://moviesapi.ir/api/v1/movies/"
+	movies := []models.Movie{}
+
 	for i := 1; i <= 250; i++ {
-
-		// getting the movies
-
 		url := fmt.Sprintf("%s%d", baseURL, i)
 		resp, err := http.Get(url)
 		if err != nil {
@@ -33,31 +81,42 @@ func FillingTheMovieTable() {
 			continue
 		}
 
-		// map it to the struct
-
-		var movie models.Movie
+		movie := models.Movie{}
 		err = json.Unmarshal(body, &movie)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Printf("Error decoding response body for ID %d: %s\n", i, err.Error())
+			continue
 		}
 
-		newMovie := models.Movie{
-			Title: movie.Title,
-			Poster: movie.Poster ,
-			Year: movie.Year,
-			Runtime: movie.Runtime,
-			Plot: movie.Plot,
-			Country: movie.Country,
-			IMDBID: movie.IMDBID,
-			Genres: movie.Genres,
-		}
-
-		// insert into movie table
-
-		database.InitialMovieInsert(newMovie , movie)
-		
-		fmt.Printf("movie id %d done \n" , i)		
+		movies = append(movies, movie)
 	}
 
-	database.CloseDb()
+	jsonData, err := json.Marshal(movies)
+	if err != nil {
+		fmt.Println("Error encoding movies data to JSON:", err)
+		os.Exit(1)
+	}
+
+	err = ioutil.WriteFile("movies.json", jsonData, 0644)
+	if err != nil {
+		fmt.Println("Error writing movies data to file:", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("Data saved to movies.json")
+}
+
+func trimQuotes(s string) string {
+
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\'' {
+			s = strRemoveAt(s, i, 1)
+		}
+	}
+
+	return s
+}
+
+func strRemoveAt(s string, index, length int) string {
+	return s[:index] + s[index+length:]
 }
