@@ -35,15 +35,25 @@ func InitialMovieInsert(movie models.Movie , movies models.Movie) (error){
 func InitialFamousPersonsInsert(movie models.Movie)(error){
 
 	// insert into famous person 
+	var err error
 	director := movie.Director
 	actor := movie.Actors
 	person := director + "," + actor
-	var err error
+
 	persons:= removeDuplicateStr(strings.Split(person , ",")) 
+
+	for i := 0; i < len(persons); i++ {
+		if string(persons[i][0]) == " " {
+			persons[i] = persons[i][1:]
+		}
+	}
+
+	persons = removeDuplicateStr(persons) 
+	
 		for i:=0 ; i<len(persons) ; i++{
 		querry := "INSERT INTO famous_person (full_name) VALUES("+ "'" + persons[i] + "'" + ")"
 		_, err = db.Query(querry)
-		
+
 		if(err != nil){
 			fmt.Println("*******************************")
 			fmt.Println(err)

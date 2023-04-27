@@ -13,7 +13,7 @@ import (
 func FillingFamousPersonTable(){
 	database.StartDb()
 
-	for i := 230; i < 250; i++ {
+	for i := 124; i < 250; i++ {
 
 		
 		jsonData, err := ioutil.ReadFile("movies.json")
