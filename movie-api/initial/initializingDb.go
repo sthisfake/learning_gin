@@ -10,11 +10,53 @@ import (
 	"os"
 )
 
+func FillingFamousPersonTable(){
+	database.StartDb()
+
+	for i := 230; i < 250; i++ {
+
+		
+		jsonData, err := ioutil.ReadFile("movies.json")
+		if err != nil {
+			fmt.Println("Error reading movies data from file:", err)
+			os.Exit(1)
+		}
+	
+		movies := []models.Movie{}
+		err = json.Unmarshal(jsonData, &movies)
+		if err != nil {
+			fmt.Println("Error decoding movies data from JSON:", err)
+			os.Exit(1)
+		}
+
+		newMovie := models.Movie{
+			Director: trimQuotes(movies[i].Director),
+			Actors: trimQuotes(movies[i].Actors),
+		}
+
+		// insert into movie table
+
+		err = database.InitialFamousPersonsInsert(newMovie)
+
+		if(err != nil){
+			fmt.Printf("movie id %d  NOT done \n" , i)
+			fmt.Println("*******************************")
+			fmt.Println(err)
+			fmt.Println("*******************************")
+		} else{
+			fmt.Printf("movie id %d done \n" , i)
+		}
+
+	}
+
+	database.CloseDb()
+}
+
 func FillingTheMovieTable() {
 
 	database.StartDb()
 
-	for i := 151; i <= 250; i++ {
+	for i := 0; i < 1; i++ {
 
 		// all movies in movies.json file into a slice of array
 

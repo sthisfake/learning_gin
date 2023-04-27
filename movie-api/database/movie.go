@@ -1,7 +1,9 @@
 package database
 
 import (
+	"fmt"
 	"movies/models"
+	"strings"
 	"time"
 )
 
@@ -26,12 +28,36 @@ func InitialMovieInsert(movie models.Movie , movies models.Movie) (error){
 	  movie.Runtime  + "'"  +", "  + "'" + movie.IMDBID  + "'"  + ")" 	
 	_, err := db.Query(querry)
 
-	if err != nil {
+	return err
+
+}
+
+func InitialFamousPersonsInsert(movie models.Movie)(error){
+
+	// insert into famous person 
+	director := movie.Director
+	actor := movie.Actors
+	person := director + "," + actor
+	var err error
+	persons:= removeDuplicateStr(strings.Split(person , ",")) 
+		for i:=0 ; i<len(persons) ; i++{
+		querry := "INSERT INTO famous_person (full_name) VALUES("+ "'" + persons[i] + "'" + ")"
+		_, err = db.Query(querry)
 		
-		return err
+		if(err != nil){
+			fmt.Println("*******************************")
+			fmt.Println(err)
+			fmt.Printf("problem in inserting %s  \n" , persons[i])
+			fmt.Println("*******************************")
+		} else{
+			fmt.Printf("value %s inserted   \n" , persons[i])
+		}
 	}
 
 	return err
+
+
+}
 
 	// // select the movie id that just inserted 
 
@@ -53,25 +79,13 @@ func InitialMovieInsert(movie models.Movie , movies models.Movie) (error){
 	// }
 
 
-	// time.Sleep(1 * time.Second )
-	// // insert into famous person 
-	// director := movies.Director
-	// actor := movies.Actors
-	// person := director + "," + actor
-	// persons:= removeDuplicateStr(strings.Split(person , ",")) 
 
 
-	// for i:=0 ; i<len(persons) ; i++{
-	// 	querry := "INSERT INTO famous_person (full_name) VALUES("+ "'" + persons[i] + "'" + ")"
-	// 	_, err = db.Query(querry)
 
-	// 	if err != nil {
-	// 		fmt.Printf("Error inserting data for  famous person loop in famous persons ID %d: %s\n", i, err.Error())
-	// 		continue
-	// 	}
-	// }
 
-	// time.Sleep(1 * time.Second )
+
+
+
 
 	// // select the person id that just inserted 
 	// // and insert into director table
@@ -289,7 +303,6 @@ func InitialMovieInsert(movie models.Movie , movies models.Movie) (error){
 	// }
 	// return err
 
-}
 
 
 func removeDuplicateStr(strSlice []string) []string {
