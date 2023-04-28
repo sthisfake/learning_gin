@@ -10,10 +10,99 @@ import (
 	"os"
 )
 
-func FillingFamousPersonTable(){
+
+func FillingActorTable(){
+
 	database.StartDb()
 
-	for i := 124; i < 250; i++ {
+	for i := 200; i < 250; i++ {
+
+		
+		jsonData, err := ioutil.ReadFile("movies.json")
+		if err != nil {
+			fmt.Println("Error reading movies data from file:", err)
+			os.Exit(1)
+		}
+	
+		movies := []models.Movie{}
+		err = json.Unmarshal(jsonData, &movies)
+		if err != nil {
+			fmt.Println("Error decoding movies data from JSON:", err)
+			os.Exit(1)
+		}
+
+		newMovie := models.Movie{
+			Actors: trimQuotes(movies[i].Actors),
+		}
+
+		// insert into movie table
+
+		err = database.InitialActorTable(newMovie)
+
+		if(err != nil){
+			fmt.Printf("movie id %d  NOT done \n" , i)
+			fmt.Println("*******************************")
+			fmt.Println(err)
+			fmt.Println("*******************************")
+		} else{
+			fmt.Printf("movie id %d done \n" , i)
+		}
+
+	}
+
+	database.CloseDb()
+
+}
+
+
+func FillingDirectorTable(){
+
+	database.StartDb()
+
+	for i := 0; i < 250; i++ {
+
+		
+		jsonData, err := ioutil.ReadFile("movies.json")
+		if err != nil {
+			fmt.Println("Error reading movies data from file:", err)
+			os.Exit(1)
+		}
+	
+		movies := []models.Movie{}
+		err = json.Unmarshal(jsonData, &movies)
+		if err != nil {
+			fmt.Println("Error decoding movies data from JSON:", err)
+			os.Exit(1)
+		}
+
+		newMovie := models.Movie{
+			Director: trimQuotes(movies[i].Director),
+		}
+
+		// insert into movie table
+
+		err = database.InitialDirectorTable(newMovie)
+
+		if(err != nil){
+			fmt.Printf("movie id %d  NOT done \n" , i)
+			fmt.Println("*******************************")
+			fmt.Println(err)
+			fmt.Println("*******************************")
+		} else{
+			fmt.Printf("movie id %d done \n" , i)
+		}
+
+	}
+
+	database.CloseDb()
+
+}
+
+func FillingFamousPersonTable(){
+	
+	database.StartDb()
+
+	for i := 0; i < 1; i++ {
 
 		
 		jsonData, err := ioutil.ReadFile("movies.json")

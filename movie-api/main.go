@@ -10,7 +10,7 @@ import (
 func init(){
 	// load .env
 	initial.LoadEnv()
-	initial.FillingFamousPersonTable()
+	initial.FillingActorTable()
 }
 
 func main() {

@@ -50,7 +50,7 @@ func InitialFamousPersonsInsert(movie models.Movie)(error){
 
 	persons = removeDuplicateStr(persons) 
 	
-		for i:=0 ; i<len(persons) ; i++{
+	for i:=0 ; i<len(persons) ; i++{
 		querry := "INSERT INTO famous_person (full_name) VALUES("+ "'" + persons[i] + "'" + ")"
 		_, err = db.Query(querry)
 
@@ -66,8 +66,106 @@ func InitialFamousPersonsInsert(movie models.Movie)(error){
 
 	return err
 
+}
+
+func InitialDirectorTable(movie models.Movie)(error){
+
+	var err error
+	director := movie.Director
+	directors:= removeDuplicateStr(strings.Split(director , ",")) 
+
+	for i := 0; i < len(directors); i++ {
+		if string(directors[i][0]) == " " {
+			directors[i] = directors[i][1:]
+		}
+	}
+
+	directors = removeDuplicateStr(directors) 
+
+	for i:=0 ; i<len(directors) ; i++{
+
+		var personId string
+		querry := "SELECT id FROM famous_person WHERE full_name= " + "'" + directors[i] + "'"
+			result, err := db.Query(querry)
+			if err != nil {
+				return err
+			}
+		
+			for result.Next(){
+				if err := result.Scan(&personId); err != nil {
+					fmt.Printf("Error fetching data  %s\n",  err.Error())
+				}
+			}
+
+
+			querry = "INSERT INTO director (person_id) VALUES("+ "'" + personId + "'" + ")"
+			_, err = db.Query(querry)
+			if err != nil {
+				return err
+			}
+
+		if(err != nil){
+			fmt.Println("*******************************")
+			fmt.Println(err)
+			fmt.Printf("problem in inserting %s  \n" , directors[i])
+			fmt.Println("*******************************")
+		} else{
+			fmt.Printf("value %s inserted   \n" , directors[i])
+		}
+	}
+
+	return err
 
 }
+
+func InitialActorTable(movie models.Movie)(error){
+
+	var err error
+	actor := movie.Actors
+	actors:= removeDuplicateStr(strings.Split(actor , ",")) 
+
+	for i := 0; i < len(actors); i++ {
+		if string(actors[i][0]) == " " {
+			actors[i] = actors[i][1:]
+		}
+	}
+
+	actors = removeDuplicateStr(actors) 
+
+	for i:=0 ; i<len(actors) ; i++{
+
+		var personId string
+		querry := "SELECT id FROM famous_person WHERE full_name= " + "'" + actors[i] + "'"
+			result, err := db.Query(querry)
+			if err != nil {
+				return err
+			}
+		
+			for result.Next(){
+				if err := result.Scan(&personId); err != nil {
+					fmt.Printf("Error fetching data  %s\n",  err.Error())
+				}
+			}
+
+
+			querry = "INSERT INTO actor (person_id) VALUES("+ "'" + personId + "'" + ")"
+			_, err = db.Query(querry)
+
+		if(err != nil){
+			fmt.Println("*******************************")
+			fmt.Println(err)
+			fmt.Printf("problem in inserting %s  \n" , actors[i])
+			fmt.Println("*******************************")
+		} else{
+			fmt.Printf("value %s inserted   \n" , actors[i])
+		}
+	}
+
+	return err
+
+
+}
+
 
 	// // select the movie id that just inserted 
 
