@@ -166,25 +166,55 @@ func InitialActorTable(movie models.Movie)(error){
 
 }
 
+func InitialDirectorMovieTable(movie models.Movie)(error){
 
-	// // select the movie id that just inserted 
+	var err error
+	var movieId string
+	var personId string
 
-	// time.Sleep(1 * time.Second )
+	querry := "SELECT id FROM movie WHERE name= " + "'" + movie.Title + "'"
+	result, err := db.Query(querry)
 
-	// var movieId string
+	if err !=nil {
+		return err
+	}
 
-	// querry = "SELECT id FROM movie WHERE name= " + "'" + movie.Title + "'"
-	// result, err := db.Query(querry)
+	for result.Next(){
+		if err := result.Scan(&movieId); err != nil {
+            fmt.Printf("Error fetching data  %s\n",  err.Error())
+        }
+	}
 
-	// if err !=nil {
-	// 	return err
-	// }
+	
+	director := movie.Director
+	directors:= removeDuplicateStr(strings.Split(director , ",")) 
 
-	// for result.Next(){
-	// 	if err := result.Scan(&movieId); err != nil {
-    //         fmt.Printf("Error fetching data  %s\n",  err.Error())
-    //     }
-	// }
+	for i := 0; i < len(directors); i++ {
+		if string(directors[i][0]) == " " {
+			directors[i] = directors[i][1:]
+		}
+	}
+
+	directors = removeDuplicateStr(directors) 
+
+	for i:=0 ; i< len(directors) ; i++ {
+
+
+		querry = "SELECT id FROM famous_person WHERE full_name= " + "'" + directors[i] + "'"
+			result, err = db.Query(querry)
+			if err != nil {
+				return err
+			}
+		
+			for result.Next(){
+				if err := result.Scan(&personId); err != nil {
+					fmt.Printf("Error fetching data  %s\n",  err.Error())
+				}
+			}
+		}
+}
+
+
 
 
 
